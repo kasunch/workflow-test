@@ -1,0 +1,30 @@
+add_executable(inproc_lat inproc_lat.cpp)
+list(APPEND target_outputs "inproc_lat")
+add_executable(local_lat local_lat.cpp)
+list(APPEND target_outputs "local_lat")
+add_executable(remote_lat remote_lat.cpp)
+list(APPEND target_outputs "remote_lat")
+add_executable(inproc_thr inproc_thr.cpp)
+list(APPEND target_outputs "inproc_thr")
+add_executable(local_thr local_thr.cpp)
+list(APPEND target_outputs "local_thr")
+add_executable(remote_thr remote_thr.cpp)
+list(APPEND target_outputs "remote_thr")
+add_executable(proxy_thr proxy_thr.cpp)
+list(APPEND target_outputs "proxy_thr")
+
+foreach(target ${target_outputs})
+    if(ZMQ_SHARED)
+        target_link_libraries(${target} libzmq)
+    else()
+        target_link_libraries(${target} libzmq-static)
+    endif()
+endforeach()
+
+include(GNUInstallDirs)
+
+foreach(target ${target_outputs})
+    install(TARGETS ${target}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
+endforeach()
