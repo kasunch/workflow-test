@@ -18,9 +18,19 @@ class ZmqTestConan(ConanFile):
     options = {"zmqshared": [True, False]}
     default_options = {"zmqshared": False}
 
+    git_is_dirty = False
+    git_commit = "unknown"
+
     def set_version(self):
-        version, _, _ = self._get_version_info()
-        self.version = version
+        git = tools.Git(folder=self.recipe_folder)
+        output = git.run("describe --all").splitlines()[0].strip()
+        self.version = re.sub("^.*/v?", "", output)
+        output = git.run("diff --stat").splitlines()[0].strip()
+        self.git_is_dirty = True if output else False
+        self.git_commit = git.run("rev-parse HEAD").splitlines()[0].strip()
+
+        self.output.info("Version: %s, Commit: %s, Is_dirty: %s" %
+                         (self.version, self.git_commit, self.git_is_dirty))
 
     def requirements(self):
         self.requires("zmq/4.3.2@bincrafters/stable")
@@ -45,21 +55,3 @@ class ZmqTestConan(ConanFile):
     def package(self):
         cmake = self._configure_cmake()
         cmake.install()
-
-    def _get_version_info(self):
-        git = tools.Git(folder=self.recipe_folder)
-
-        output = git.run("describe --all")
-        print(output)
-
-        if not self.version:
-            version = git.get_tag() or git.get_branch() or "unknown"
-            version = re.sub("^.*/v?|^v?", "", version)
-        else:
-            version = self.version
-        commit = git.get_commit() or "unknown"
-        is_dirty = not git.is_pristine()
-
-        print(is_dirty)
-
-        return version, commit, is_dirty
