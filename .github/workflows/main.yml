@@ -27,22 +27,22 @@ jobs:
 
       - name: Install Conan
         run: |
-            pip install --upgrade pip cmake
-            python --version
-            pip --version
-            which cmake
-            cmake --version
-            pip install conan-package-tools
-            pip install git+https://github.com/blixttech/cpt-helpers.git
-            conan user
+          pip install --upgrade pip cmake
+          python --version
+          pip --version
+          which cmake
+          cmake --version
+          pip install conan-package-tools
+          pip install git+https://github.com/blixttech/cpt-helpers.git
+          conan user
 
       - name: Build
-        run: python build.py
-
-      env:
-        CONAN_USER: "kasunch"
-        CONAN_LOGIN_USERNAME: ${{ secrets.CONAN_LOGIN_USERNAME }}
-        CONAN_PASSWORD: ${{ secrets.CONAN_PASSWORD }}
-        CONAN_DOCKER_IMAGE: "conanio/gcc7"
-        CONAN_GCC_VERSIONS: "7"
-        CONAN_BUILD_TYPES: "Release"
+        env:
+          CONAN_USER: "kasunch"
+          CONAN_LOGIN_USERNAME: ${{ secrets.CONAN_LOGIN_USERNAME }}
+          CONAN_PASSWORD: ${{ secrets.CONAN_PASSWORD }}
+          CONAN_DOCKER_IMAGE: "conanio/gcc7"
+          CONAN_GCC_VERSIONS: "7"
+          CONAN_BUILD_TYPES: "Release"
+        run: |
+          python build.py
