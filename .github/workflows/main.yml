@@ -45,6 +45,7 @@ jobs:
           CONAN_PASSWORD: ${{ secrets.CONAN_PASSWORD }}
           CONAN_DOCKER_IMAGE: "conanio/gcc7"
           CONAN_GCC_VERSIONS: "7"
+          CONAN_ARCHS: "x86_64"
           CONAN_BUILD_TYPES: "Release"
           CONAN_UPLOAD_ONLY_WHEN_STABLE: "true"
           CONAN_SYSREQUIRES_MODE: "enabled"
