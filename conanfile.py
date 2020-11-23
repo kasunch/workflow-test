@@ -3,12 +3,12 @@ from conans.errors import ConanException
 import os, re, configparser
 
 class ZmqTestConan(ConanFile):
+    name = "zmqtest"
     description = "Test application for testing zmq"
     topics = ("zmq")
     url = "https://github.com/kasunch/workflow-test"
     homepage = "https://github.com/bincrafters/conan-zmq"
     license = "	Apache-2.0"  # SPDX Identifiers https://spdx.org/licenses/
-    exports = ["project.conf"]
     exports_sources = ["CMakeLists.txt", "src/*"]
     generators = "cmake"
 
@@ -16,15 +16,9 @@ class ZmqTestConan(ConanFile):
     options = {"zmqshared": [True, False]}
     default_options = {"zmqshared": False}
 
-    def set_name(self):
-        parser = self._get_config()
-        self.name = parser["conanfile"]["name"]
-
     def set_version(self):
-        if not self.version:
-            git = tools.Git(folder=self.recipe_folder)
-            version = re.sub(".*/", "", str(git.get_branch()))
-            self.version = version
+        version, _, _ = self._get_version_info()
+        self.version = version
 
     def requirements(self):
         self.requires("zmq/4.3.2@bincrafters/stable")
@@ -50,7 +44,13 @@ class ZmqTestConan(ConanFile):
         cmake = self._configure_cmake()
         cmake.install()
 
-    def _get_config(self):
-        parser = configparser.ConfigParser()
-        parser.read(os.path.join(os.path.dirname(os.path.abspath(__file__)), "project.conf"))
-        return parser
+    def _get_version_info(self):
+        git = tools.Git(folder=self.recipe_folder)
+        if not self.version: 
+            version = git.get_tag() or git.get_branch() or "unknown"
+            version = re.sub("^.*/v?|^v?", "", version)
+        else:
+            version = self.version
+        commit = git.get_commit() or "unknown"
+        is_dirty = git.is_pristine()
+        return version, commit, is_dirty
