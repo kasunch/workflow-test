@@ -25,7 +25,7 @@ class ZmqTestConan(ConanFile):
         git = tools.Git(folder=self.recipe_folder)
         output = git.run("describe --all").splitlines()[0].strip()
         self.version = re.sub("^.*/v?", "", output)
-        output = git.run("diff --stat").splitlines()[0].strip()
+        output = git.run("diff --stat").splitlines()
         self.git_is_dirty = True if output else False
         self.git_commit = git.run("rev-parse HEAD").splitlines()[0].strip()
 
