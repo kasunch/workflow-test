@@ -1,9 +1,10 @@
 from cpt.packager import ConanMultiPackager
 from cpt_helpers.build_helper import *
+import traceback
 
 if __name__ == "__main__":
     try:
-        builder = ConanMultiPackager(out=hidesensitive)
+        builder = ConanMultiPackager(reference="%s/%s" % get_name_and_version(), out=hidesensitive)
         builder.add_common_builds()
         builder.run()
     except Exception as e:
