@@ -1,6 +1,8 @@
 from conans import ConanFile, CMake, tools
 from conans.errors import ConanException
-import os, re, configparser
+import os
+import re
+
 
 class ZmqTestConan(ConanFile):
     name = "zmqtest"
@@ -33,7 +35,7 @@ class ZmqTestConan(ConanFile):
         cmake.definitions["USE_CONAN_BUILD_INFO"] = "ON"
         del cmake.definitions["CMAKE_EXPORT_NO_PACKAGE_REGISTRY"]
         cmake.configure()
-        
+
         return cmake
 
     def build(self):
@@ -46,11 +48,18 @@ class ZmqTestConan(ConanFile):
 
     def _get_version_info(self):
         git = tools.Git(folder=self.recipe_folder)
-        if not self.version: 
+
+        output = git.run("describe --all")
+        print(output)
+
+        if not self.version:
             version = git.get_tag() or git.get_branch() or "unknown"
             version = re.sub("^.*/v?|^v?", "", version)
         else:
             version = self.version
         commit = git.get_commit() or "unknown"
-        is_dirty = git.is_pristine()
+        is_dirty = not git.is_pristine()
+
+        print(is_dirty)
+
         return version, commit, is_dirty
