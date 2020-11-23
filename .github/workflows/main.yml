@@ -39,7 +39,8 @@ jobs:
 
       - name: Build
         env:
-          CONAN_USER: "kasunch"
+          CONAN_USER: ""
+          CONAN_CHANNEL: ""
           CONAN_LOGIN_USERNAME: ${{ secrets.CONAN_LOGIN_USERNAME }}
           CONAN_PASSWORD: ${{ secrets.CONAN_PASSWORD }}
           CONAN_DOCKER_IMAGE: "conanio/gcc7"
