@@ -34,6 +34,7 @@ jobs:
           cmake --version
           pip install conan-package-tools
           pip install git+https://github.com/blixttech/cpt-helpers.git
+          conan --version
           conan user
 
       - name: Build
@@ -44,5 +45,7 @@ jobs:
           CONAN_DOCKER_IMAGE: "conanio/gcc7"
           CONAN_GCC_VERSIONS: "7"
           CONAN_BUILD_TYPES: "Release"
+          CONAN_UPLOAD_ONLY_WHEN_STABLE: "true"
+          CONAN_SYSREQUIRES_MODE: "enabled"
         run: |
           python build.py
