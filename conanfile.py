@@ -18,8 +18,9 @@ class ZmqTestConan(ConanFile):
     options = {"zmqshared": [True, False]}
     default_options = {"zmqshared": False}
 
-    git_is_dirty = False
-    git_commit = "unknown"
+    _git_is_dirty = False
+    _git_commit = "unknown"
+    _cmake = None
 
     def set_version(self):
         git = tools.Git(folder=self.recipe_folder)
@@ -27,11 +28,11 @@ class ZmqTestConan(ConanFile):
             output = git.run("describe --all").splitlines()[0].strip()
             self.version = re.sub("^.*/v?|^v?", "", output)
         output = git.run("diff --stat").splitlines()
-        self.git_is_dirty = True if output else False
-        self.git_commit = git.run("rev-parse HEAD").splitlines()[0].strip()
+        self._git_is_dirty = True if output else False
+        self._git_commit = git.run("rev-parse HEAD").splitlines()[0].strip()
 
         self.output.info("Version: %s, Commit: %s, Is_dirty: %s" %
-                         (self.version, self.git_commit, self.git_is_dirty))
+                         (self.version, self._git_commit, self._git_is_dirty))
 
     def requirements(self):
         self.requires("zmq/4.3.2@bincrafters/stable")
@@ -41,13 +42,13 @@ class ZmqTestConan(ConanFile):
             self.options["zmq"].shared = False
 
     def _configure_cmake(self):
-        cmake = CMake(self)
-        cmake.definitions["ZMQ_SHARED"] = "ON" if self.options.zmqshared else "OFF"
-        cmake.definitions["USE_CONAN_BUILD_INFO"] = "ON"
-        del cmake.definitions["CMAKE_EXPORT_NO_PACKAGE_REGISTRY"]
-        cmake.configure()
-
-        return cmake
+        if not self._cmake:
+            self._cmake = CMake(self)
+            self._cmake.definitions["ZMQ_SHARED"] = "ON" if self.options.zmqshared else "OFF"
+            self._cmake.definitions["USE_CONAN_BUILD_INFO"] = "ON"
+            del self._cmake.definitions["CMAKE_EXPORT_NO_PACKAGE_REGISTRY"]
+            self._cmake.configure()
+        return self._cmake
 
     def build(self):
         cmake = self._configure_cmake()
